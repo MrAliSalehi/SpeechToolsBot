@@ -1,4 +1,5 @@
 ﻿using System.Security.Cryptography.X509Certificates;
+using System.Text.Json;
 
 namespace SpeechToolsBot.Common.Extensions;
 
@@ -14,7 +15,7 @@ internal static class CertificateExtensions
 
             if (certCollection.Count is 0)
             {
-                throw new ArgumentException("Certificate Is Not Installed");
+                throw new ArgumentException($"Certificate Is Not Installed-Store location:{store.Location}\nCertCollection[{JsonSerializer.Serialize(store.Certificates)}]");
             }
             return certCollection.First();
         }

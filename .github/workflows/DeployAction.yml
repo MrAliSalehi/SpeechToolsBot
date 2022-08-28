@@ -1,0 +1,24 @@
+name: .NET
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: self-hosted
+
+    steps:
+    - name: stop The Service
+      run: sudo systemctl stop SpeechToolBot.service
+    - name: Git Pull
+      run: sudo git -C /home/mrali109/SpeechToolsBot/SpeechToolsBot pull origin master;
+    - name: Publish
+      run: sudo dotnet publish /home/mrali109/SpeechToolsBot/SpeechToolsBot/SpeechToolsBot.csproj -r linux-x64 -c Release --self-contained false -o /bin/Release/Linux
+    - name: Grant Access To Directory
+      run: sudo chmod 777 /home/mrali109/SpeechToolsBot/SpeechToolsBot/bin/Release/net6.0/linux-x64/*
+    - name: Reload Services
+      run: sudo systemctl daemon-reload
+    - name: start The Service
+      run: sudo systemctl start SpeechToolBot.service

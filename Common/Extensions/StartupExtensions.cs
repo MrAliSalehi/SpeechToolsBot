@@ -92,8 +92,8 @@ internal static class StartupExtensions
         }
         else
         {
-            workingDir = "/ffmpeg/";
-            binFolder = @"/ffmpeg/bin";
+            workingDir = "/usr/bin";
+            binFolder = "/usr/bin/ffmpeg";
         }
         GlobalFFOptions.Configure(options =>
         {

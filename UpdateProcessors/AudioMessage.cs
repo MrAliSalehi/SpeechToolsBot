@@ -22,12 +22,6 @@ internal class AudioMessage
     {
         _client = client;
         _speechToTextApi = speechToTextApi;
-
-        GlobalFFOptions.Configure(options =>
-        {
-            options.WorkingDirectory = @"D:\Projects\C#\TelegramProducts\BotApi\TextToSpeech\TextToSpeechBot\bin\Debug\net6.0\ffmpeg";
-            options.BinaryFolder = @"D:\Projects\C#\TelegramProducts\BotApi\TextToSpeech\TextToSpeechBot\bin\Debug\net6.0\ffmpeg\bin\";
-        });
     }
 
     public async Task ProcessAudioAsync(Message message, CancellationToken ct = default)

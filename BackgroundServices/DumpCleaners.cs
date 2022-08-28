@@ -6,7 +6,7 @@ namespace SpeechToolsBot.BackgroundServices;
 
 internal static class DumpCleaners
 {
-    private readonly static List<string> FilePathList = new();
+    private static readonly List<string> FilePathList = new();
     private static DateTimeOffset _offsetToDelete = DateTimeOffset.Now;
     private static TimeSpan _timeToDelete = TimeSpan.Zero;
 
@@ -67,8 +67,8 @@ internal static class DumpCleaners
                 _offsetToDelete = DateTimeOffset.Now.AddSeconds(20);
                 break;
             case nameof(Environments.Production):
-                _timeToDelete = TimeSpan.FromMinutes(2);
-                _offsetToDelete = DateTimeOffset.Now.AddSeconds(20);
+                _timeToDelete = TimeSpan.FromHours(3);
+                _offsetToDelete = DateTimeOffset.Now.AddSeconds(40);
                 break;
         }
     }

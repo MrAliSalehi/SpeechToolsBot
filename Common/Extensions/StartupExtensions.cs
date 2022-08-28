@@ -1,4 +1,5 @@
-﻿using Microsoft.CognitiveServices.Speech;
+﻿using FFMpegCore;
+using Microsoft.CognitiveServices.Speech;
 using Serilog.Events;
 using SpeechToolsBot.ApiCalls;
 using SpeechToolsBot.BackgroundServices;
@@ -78,5 +79,26 @@ internal static class StartupExtensions
         DumpCleaners.CreateImageFolderIfNeeded();
         DumpCleaners.SetDeletionTimeBasedOnEnvironments();
         DumpCleaners.StartTheCleaner();
+    }
+
+    public static void AddFfmpeg()
+    {
+        string workingDir;
+        string binFolder;
+        if (StaticVariables.EnvironmentName == Environments.Development)
+        {
+            workingDir = @"D:\Projects\C#\TelegramProducts\BotApi\TextToSpeech\TextToSpeechBot\bin\Debug\net6.0\ffmpeg";
+            binFolder = @"D:\Projects\C#\TelegramProducts\BotApi\TextToSpeech\TextToSpeechBot\bin\Debug\net6.0\ffmpeg\bin\";
+        }
+        else
+        {
+            workingDir = "/ffmpeg/";
+            binFolder = @"/ffmpeg/bin";
+        }
+        GlobalFFOptions.Configure(options =>
+        {
+            options.WorkingDirectory = workingDir;
+            options.BinaryFolder = binFolder;
+        });
     }
 }

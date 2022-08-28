@@ -17,7 +17,7 @@ jobs:
     - name: Publish
       run: sudo dotnet publish /home/mrali109/SpeechToolsBot/SpeechToolsBot/SpeechToolsBot.csproj -r linux-x64 -c Release --self-contained false -o /bin/Release/Linux
     - name: Grant Access To Directory
-      run: sudo chmod 777 /home/mrali109/SpeechToolsBot/bin/Release/net6.0/linux-x64/*
+      run: sudo chmod 777 /home/mrali109/SpeechToolsBot/SpeechToolsBot/bin/Release/net6.0/linux-x64/*
     - name: Reload Services
       run: sudo systemctl daemon-reload
     - name: start The Service

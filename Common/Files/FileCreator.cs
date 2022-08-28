@@ -1,15 +1,35 @@
-﻿namespace WorkerService1.Common.Files;
+﻿using SpeechToolsBot.Common.Contracts;
+
+namespace SpeechToolsBot.Common.Files;
 
 internal class FileCreator : IFileCreator
 {
-    private FileCreator()
-    {
-    }
-
-    internal static FileCreator CreateFile() => new();
-
     private readonly List<string> _folders = new();
     private string _fileName = string.Empty;
+
+    private FileCreator() { }
+
+    public IFileCreator FileNameAndFormat(string name, string format)
+    {
+        _fileName = name + $".{format}";
+        return this;
+    }
+
+    public string BuildPathAndFile()
+    {
+        var path = Path.Combine(_folders.ToArray());
+
+        if (!Directory.Exists(path))
+            path = Directory.CreateDirectory(path).FullName;
+
+        var combineFileAndPath = Path.Combine(path, _fileName);
+        if (File.Exists(combineFileAndPath))
+            return combineFileAndPath;
+
+        using var createdStream = File.Create(combineFileAndPath);
+        createdStream.Dispose();
+        return combineFileAndPath;
+    }
 
     public IFileCreator Folder(string folderName)
     {
@@ -41,25 +61,11 @@ internal class FileCreator : IFileCreator
         return this;
     }
 
-    public IFileCreator FileNameAndFormat(string name, string format)
+    public IFileCreator FullNameWithFormat(string fileName)
     {
-        _fileName = name + $".{format}";
+        _fileName = fileName;
         return this;
     }
 
-    public string BuildPathAndFile()
-    {
-        var path = Path.Combine(_folders.ToArray());
-
-        if (!Directory.Exists(path))
-            path = Directory.CreateDirectory(path).FullName;
-
-        var combineFileAndPath = Path.Combine(path, _fileName);
-        if (File.Exists(combineFileAndPath))
-            return combineFileAndPath;
-
-        using var createdStream = File.Create(combineFileAndPath);
-        createdStream.Dispose();
-        return combineFileAndPath;
-    }
+    internal static FileCreator CreateFile() => new();
 }

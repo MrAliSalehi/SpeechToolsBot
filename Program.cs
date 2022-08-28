@@ -4,6 +4,8 @@ try
 
     host.AddEnv();
 
+    StartupExtensions.AddDumpCleaner();
+
     host.AddSerilog();
 
     host.AddConfiguration();

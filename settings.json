@@ -1,3 +1,8 @@
 ﻿{
-  "BotToken": "5254933366:AAFeE2u3ES4zF8QcrDX87A-xBQKbwOfsUa8"
+  "AzureConfig": {
+    "ApplicationClientId": "48d8b2a5-222c-426f-b093-d79279360589",
+    "ThumbPrint": "74BE59F36B3362051EDDAFB1248CCE03FC92F7AB"
+  },
+  "BotToken": "<FROM KEY VAULT>",
+  "SpeechApiKey": "<FROM KEY VAULT>"
 }

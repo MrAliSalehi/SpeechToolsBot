@@ -1,7 +1,7 @@
 ﻿using Telegram.Bot;
 using Telegram.Bot.Types;
 
-namespace WorkerService1.Common.Contracts;
+namespace SpeechToolsBot.Common.Contracts;
 
 public interface IUpdateReceiver
 {

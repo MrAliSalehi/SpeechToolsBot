@@ -1,10 +1,11 @@
 ﻿using Telegram.Bot.Polling;
 using Telegram.Bot.Types.Enums;
 
-namespace WorkerService1.Common.Static;
+namespace SpeechToolsBot.Common.Static;
 
 internal static class StaticVariables
 {
+    public const string BaseAudioPath = "Audio";
     public static string EnvironmentName { get; set; } = Environments.Development;
 
     public static ReceiverOptions ReceiverOptions { get; } = new()

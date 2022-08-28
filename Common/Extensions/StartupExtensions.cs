@@ -1,11 +1,12 @@
-﻿using Serilog;
+﻿using Microsoft.CognitiveServices.Speech;
 using Serilog.Events;
+using SpeechToolsBot.ApiCalls;
+using SpeechToolsBot.BackgroundServices;
+using SpeechToolsBot.Common.Files;
+using SpeechToolsBot.UpdateProcessors;
 using Telegram.Bot;
-using WorkerService1.BackgroundServices;
-using WorkerService1.Common.Files;
-using WorkerService1.UpdateProcessors;
 
-namespace WorkerService1.Common.Extensions;
+namespace SpeechToolsBot.Common.Extensions;
 
 internal static class StartupExtensions
 {
@@ -42,6 +43,13 @@ internal static class StartupExtensions
             var settingsFileName = StaticVariables.EnvironmentName == Environments.Development ? "" : ".prod";
 
             builder.SetBasePath(context.HostingEnvironment.ContentRootPath).AddJsonFile($"settings{settingsFileName}.json", false, true).Build();
+
+            var configurationRoot = builder.Build();
+
+            var clientId = configurationRoot.GetSection("AzureConfig:ApplicationClientId").Get<string>();
+            var thumbPrint = configurationRoot.GetSection("AzureConfig:ThumbPrint").Get<string>();
+
+            builder.AddAzureKeyVault("https://qwxpkeyvault.vault.azure.net/", clientId, thumbPrint.GetCertificate());
         });
     }
 
@@ -51,12 +59,24 @@ internal static class StartupExtensions
         {
             var botToken = builder.Configuration.GetSection("BotToken").Get<string>();
             collection.AddSingleton<ITelegramBotClient, TelegramBotClient>(_ => new TelegramBotClient(botToken));
+
             collection.AddSingleton<TextMessage>();
+            collection.AddSingleton<AudioMessage>();
+
+            var subscriptionKey = builder.Configuration.GetSection("SpeechApiKey").Get<string>();
+            var speechConfig = SpeechConfig.FromSubscription(subscriptionKey, "eastus");
+
+            collection.AddSingleton(_ => new TextToSpeechApi(speechConfig));
+            collection.AddSingleton(_ => new SpeechToTextApi(speechConfig));
         });
     }
 
-    public static void AddBackgroundServices(this IHostBuilder host)
+    public static void AddBackgroundServices(this IHostBuilder host) { host.ConfigureServices(collection => { collection.AddHostedService<UpdateReceiver>(); }); }
+
+    public static void AddDumpCleaner()
     {
-        host.ConfigureServices(collection => { collection.AddHostedService<UpdateReceiver>(); });
+        DumpCleaners.CreateImageFolderIfNeeded();
+        DumpCleaners.SetDeletionTimeBasedOnEnvironments();
+        DumpCleaners.StartTheCleaner();
     }
 }

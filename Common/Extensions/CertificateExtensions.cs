@@ -6,21 +6,15 @@ internal static class CertificateExtensions
 {
     public static X509Certificate2 GetCertificate(this string thumbPrint)
     {
-        var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
-        try
-        {
-            store.Open(OpenFlags.ReadOnly);
-            var certCollection = store.Certificates.Find(X509FindType.FindByThumbprint, thumbPrint, false);
+        using var store = new X509Store(StoreName.CertificateAuthority, StoreLocation.LocalMachine);
 
-            if (certCollection.Count is 0)
-            {
-                throw new ArgumentException($"Certificate Is Not Installed-Store location:[{store.Location}]");
-            }
-            return certCollection.First();
-        }
-        finally
+        store.Open(OpenFlags.ReadOnly);
+        var certCollection = store.Certificates.Find(X509FindType.FindByThumbprint, thumbPrint, false);
+
+        if (certCollection.Count is 0)
         {
-            store.Close();
+            throw new ArgumentException($"Certificate Is Not Installed-Store location:[{store.Location}]");
         }
+        return certCollection.First();
     }
 }

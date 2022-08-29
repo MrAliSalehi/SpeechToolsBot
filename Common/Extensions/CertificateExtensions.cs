@@ -11,10 +11,11 @@ internal static class CertificateExtensions
         store.Open(OpenFlags.ReadOnly);
         var certCollection = store.Certificates.Find(X509FindType.FindByThumbprint, thumbPrint, false);
 
-        if (certCollection.Count is 0)
-        {
-            throw new ArgumentException($"Certificate Is Not Installed-Store location:[{store.Location}]\nall Cert Count:{store.Certificates.Count}");
-        }
-        return certCollection.First();
+        if (certCollection.Count is not 0)
+            return certCollection.First();
+
+        Log.Error("{FriendlyName}{SubjectNameName}",
+            store.Certificates.First().FriendlyName, store.Certificates.First().SubjectName.Name);
+        throw new ArgumentException($"Certificate Is Not Installed\nall Cert Count:{store.Certificates.Count}");
     }
 }

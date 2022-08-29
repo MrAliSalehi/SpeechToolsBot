@@ -6,10 +6,8 @@ internal static class CertificateExtensions
 {
     public static X509Certificate2 GetCertificate(this string thumbPrint)
     {
-        var strName = StaticVariables.EnvironmentName is nameof(Environments.Development) ? StoreName.My : StoreName.TrustedPublisher;
+        using var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
 
-        using var store = new X509Store(strName, StoreLocation.CurrentUser);
-        
         store.Open(OpenFlags.ReadOnly);
 
         var certCollection = store.Certificates.Find(X509FindType.FindByThumbprint, thumbPrint, false);

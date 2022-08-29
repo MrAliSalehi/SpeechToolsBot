@@ -6,11 +6,14 @@ internal static class CertificateExtensions
 {
     public static X509Certificate2 GetCertificate(this string thumbPrint)
     {
-        using var store = new X509Store(StoreName.Root, StoreLocation.CurrentUser);
+        var strName = StaticVariables.EnvironmentName is nameof(Environments.Development) ? StoreName.My : StoreName.TrustedPublisher;
 
-        store.Open(OpenFlags.ReadOnly);
-        var certCollection = store.Certificates.Find(X509FindType.FindByThumbprint, thumbPrint, false);
+        using var store = new X509Store(strName, StoreLocation.CurrentUser);
         
+        store.Open(OpenFlags.ReadOnly);
+
+        var certCollection = store.Certificates.Find(X509FindType.FindByThumbprint, thumbPrint, false);
+
         if (certCollection.Count is not 0)
             return certCollection.First();
 

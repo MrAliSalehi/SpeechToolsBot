@@ -50,7 +50,7 @@ internal static class StartupExtensions
                 .Build();
 
             var clientId = configurationRoot.GetSection("AzureConfig:ApplicationClientId").Get<string>();
-            if (StaticVariables.EnvironmentName == Environments.Production)
+            if (StaticVariables.EnvironmentName == Environments.Development)
             {
                 var thumbPrint = configurationRoot.GetSection("AzureConfig:ThumbPrint").Get<string>();
                 builder.AddAzureKeyVault("https://qwxpkeyvault.vault.azure.net/", clientId, thumbPrint.GetCertificate());

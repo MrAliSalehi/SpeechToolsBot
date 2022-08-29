@@ -6,6 +6,8 @@ try
 
     StartupExtensions.AddDumpCleaner();
 
+    StartupExtensions.AddFfmpeg();
+
     host.AddSerilog();
 
     host.AddConfiguration();

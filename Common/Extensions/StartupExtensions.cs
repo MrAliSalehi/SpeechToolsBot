@@ -1,4 +1,5 @@
-﻿using FFMpegCore;
+﻿using System.Collections;
+using FFMpegCore;
 using Microsoft.CognitiveServices.Speech;
 using Serilog.Events;
 using SpeechToolsBot.ApiCalls;
@@ -43,14 +44,22 @@ internal static class StartupExtensions
         {
             var settingsFileName = StaticVariables.EnvironmentName == Environments.Development ? "" : ".prod";
 
-            builder.SetBasePath(context.HostingEnvironment.ContentRootPath).AddJsonFile($"settings{settingsFileName}.json", false, true).Build();
-
-            var configurationRoot = builder.Build();
+            var configurationRoot = builder
+                .SetBasePath(context.HostingEnvironment.ContentRootPath).AddJsonFile($"settings{settingsFileName}.json", false, true)
+                .AddEnvironmentVariables()
+                .Build();
 
             var clientId = configurationRoot.GetSection("AzureConfig:ApplicationClientId").Get<string>();
-            var thumbPrint = configurationRoot.GetSection("AzureConfig:ThumbPrint").Get<string>();
-
-            builder.AddAzureKeyVault("https://qwxpkeyvault.vault.azure.net/", clientId, thumbPrint.GetCertificate());
+            if (StaticVariables.EnvironmentName == Environments.Production)
+            {
+                var thumbPrint = configurationRoot.GetSection("AzureConfig:ThumbPrint").Get<string>();
+                builder.AddAzureKeyVault("https://qwxpkeyvault.vault.azure.net/", clientId, thumbPrint.GetCertificate());
+            }
+            else
+            {
+                var secret = Environment.GetEnvironmentVariable("AzureAuthSecret", EnvironmentVariableTarget.Machine);
+                builder.AddAzureKeyVault("https://qwxpkeyvault.vault.azure.net/", clientId, secret);
+            }
         });
     }
 

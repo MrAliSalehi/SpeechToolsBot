@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using FFMpegCore;
+﻿using FFMpegCore;
 using Microsoft.CognitiveServices.Speech;
 using Serilog.Events;
 using SpeechToolsBot.ApiCalls;
@@ -57,7 +56,7 @@ internal static class StartupExtensions
             }
             else
             {
-                var secret = Environment.GetEnvironmentVariable("AzureAuthSecret", EnvironmentVariableTarget.Machine);
+                var secret = Environment.GetEnvironmentVariable("AzureAuthSecret");
                 builder.AddAzureKeyVault("https://qwxpkeyvault.vault.azure.net/", clientId, secret);
             }
         });

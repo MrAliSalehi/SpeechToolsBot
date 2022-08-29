@@ -60,7 +60,7 @@ internal static class StartupExtensions
                 var secret = Environment.GetEnvironmentVariable("DOTNET_AzureAuthSecret");
                 if (secret is null)
                 {
-                    foreach (var variable in Environment.GetEnvironmentVariables(EnvironmentVariableTarget.Machine).Cast<DictionaryEntry>().Where(variable => variable.Key.ToString().Contains("DOTNET_AzureAuthSecret")))
+                    foreach (var variable in Environment.GetEnvironmentVariables().Cast<DictionaryEntry>().Where(variable => variable.Key.ToString().Contains("DOTNET_AzureAuthSecret")))
                     {
                         secret = variable.Value.ToString();
                         break;

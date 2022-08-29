@@ -14,7 +14,7 @@ internal static class CertificateExtensions
         if (certCollection.Count is not 0)
             return certCollection.First();
 
-        Log.Error("{FriendlyName}{SubjectNameName}",
+        Log.Error("name:[{FriendlyName}]subjName:[{SubjectNameName}]",
             store.Certificates.First().FriendlyName, store.Certificates.First().SubjectName.Name);
         throw new ArgumentException($"Certificate Is Not Installed\nall Cert Count:{store.Certificates.Count}");
     }

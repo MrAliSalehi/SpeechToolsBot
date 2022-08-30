@@ -54,7 +54,9 @@ internal class UpdateReceiver : BackgroundService, IUpdateReceiver
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                await _client.ReceiveAsync((_, update, arg3) => HandleUpdatesAsync(update, arg3), (_, exception, _) => HandleErrorsAsync(exception), StaticVariables.ReceiverOptions, cancellationToken);
+                await _client.ReceiveAsync((_, update, arg3) => HandleUpdatesAsync(update, arg3),
+                    (_, exception, _) => HandleErrorsAsync(exception),
+                    StaticVariables.ReceiverOptions, cancellationToken);
 
                 await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
             }

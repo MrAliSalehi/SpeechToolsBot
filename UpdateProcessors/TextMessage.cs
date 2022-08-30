@@ -52,14 +52,14 @@ internal class TextMessage
         {
             await using var stream = new MemoryStream();
             await stream.WriteAsync(apiResponse.AudioData, ct);
-            
+
             InputOnlineFile? outPutFile = stream;
 
             stream.Position = 0;
             if (stream is null || outPutFile is null)
                 throw new NullReferenceException($"Reason:{apiResponse.Reason}");
-            
-            Log.Information("stream Position:[{Pos}]--Capacity:[{Str}]", stream.Position, stream.Capacity);
+
+            Log.Information("stream Position:[{Pos}]--Capacity:[{Str}]--Reason:{Rs}", stream.Position, stream.Capacity, apiResponse.Reason);
             await _client.SendVoiceAsync(message.Chat.Id, outPutFile, $"Status : {apiResponse.Reason}\nDuration:{apiResponse.AudioDuration:g}", duration: apiResponse.AudioDuration.Seconds, cancellationToken: ct);
         }
         catch (OverflowException)

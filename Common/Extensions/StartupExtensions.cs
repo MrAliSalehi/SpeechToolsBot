@@ -115,7 +115,7 @@ internal static class StartupExtensions
         {
             var binFolder = StaticVariables.EnvironmentName == Environments.Development
                 ? @"D:\Projects\C#\TelegramProducts\BotApi\TextToSpeech\TextToSpeechBot\bin\Debug\net6.0\ffmpeg\bin\"
-                : "/usr/bin/ffmpeg";
+                : $"{Environment.CurrentDirectory}/usr/bin/";
             options.BinaryFolder = binFolder;
         });
     }

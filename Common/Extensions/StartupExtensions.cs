@@ -111,21 +111,11 @@ internal static class StartupExtensions
 
     public static void AddFfmpeg()
     {
-        string workingDir;
-        string binFolder;
-        if (StaticVariables.EnvironmentName == Environments.Development)
-        {
-            workingDir = @"D:\Projects\C#\TelegramProducts\BotApi\TextToSpeech\TextToSpeechBot\bin\Debug\net6.0\ffmpeg";
-            binFolder = @"D:\Projects\C#\TelegramProducts\BotApi\TextToSpeech\TextToSpeechBot\bin\Debug\net6.0\ffmpeg\bin\";
-        }
-        else
-        {
-            workingDir = "/usr/bin";
-            binFolder = "/usr/bin/ffmpeg";
-        }
         GlobalFFOptions.Configure(options =>
         {
-            options.WorkingDirectory = workingDir;
+            var binFolder = StaticVariables.EnvironmentName == Environments.Development
+                ? @"D:\Projects\C#\TelegramProducts\BotApi\TextToSpeech\TextToSpeechBot\bin\Debug\net6.0\ffmpeg\bin\"
+                : "/usr/bin/ffmpeg";
             options.BinaryFolder = binFolder;
         });
     }

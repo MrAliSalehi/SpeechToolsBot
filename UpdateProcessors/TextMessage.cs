@@ -53,7 +53,10 @@ internal class TextMessage
             await stream.WriteAsync(apiResponse.AudioData, ct);
 
             stream.Position = 0;
+            if (stream is null)
+                throw new NullReferenceException();
 
+            Log.Information("stream Position:[{Pos}]\nCapacity:[{Str}]", stream.Position, stream.Capacity);
             await _client.SendVoiceAsync(message.Chat.Id, stream, $"Status : {apiResponse.Reason}\nDuration:{apiResponse.AudioDuration:g}", duration: apiResponse.AudioDuration.Seconds, cancellationToken: ct);
         }
         catch (OverflowException)

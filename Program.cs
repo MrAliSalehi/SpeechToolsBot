@@ -1,6 +1,6 @@
 try
 {
-    var host = Host.CreateDefaultBuilder(args);
+    var host = Host.CreateDefaultBuilder(args).UseSystemd();
 
     host.AddEnv();
 

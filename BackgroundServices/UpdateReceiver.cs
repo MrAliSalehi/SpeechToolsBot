@@ -61,6 +61,10 @@ internal class UpdateReceiver : BackgroundService, IUpdateReceiver
                 await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
             }
         }
+        catch (TaskCanceledException)
+        {
+            //ignore
+        }
         catch (Exception e)
         {
             Log.Error(e.Demystify(), nameof(ExecuteTask));

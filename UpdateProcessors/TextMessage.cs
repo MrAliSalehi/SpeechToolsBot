@@ -4,6 +4,7 @@ using SpeechToolsBot.UpdateProcessors.CommandHandlers;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.InputFiles;
 
 namespace SpeechToolsBot.UpdateProcessors;
 
@@ -51,13 +52,15 @@ internal class TextMessage
         {
             await using var stream = new MemoryStream();
             await stream.WriteAsync(apiResponse.AudioData, ct);
+            
+            InputOnlineFile? outPutFile = stream;
 
             stream.Position = 0;
-            if (stream is null)
-                throw new NullReferenceException();
-
-            Log.Information("stream Position:[{Pos}]\nCapacity:[{Str}]", stream.Position, stream.Capacity);
-            await _client.SendVoiceAsync(message.Chat.Id, stream, $"Status : {apiResponse.Reason}\nDuration:{apiResponse.AudioDuration:g}", duration: apiResponse.AudioDuration.Seconds, cancellationToken: ct);
+            if (stream is null || outPutFile is null)
+                throw new NullReferenceException($"Reason:{apiResponse.Reason}");
+            
+            Log.Information("stream Position:[{Pos}]--Capacity:[{Str}]", stream.Position, stream.Capacity);
+            await _client.SendVoiceAsync(message.Chat.Id, outPutFile, $"Status : {apiResponse.Reason}\nDuration:{apiResponse.AudioDuration:g}", duration: apiResponse.AudioDuration.Seconds, cancellationToken: ct);
         }
         catch (OverflowException)
         {

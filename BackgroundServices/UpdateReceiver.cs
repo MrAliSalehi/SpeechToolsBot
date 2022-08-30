@@ -40,6 +40,14 @@ internal class UpdateReceiver : BackgroundService, IUpdateReceiver
         return Task.CompletedTask;
     }
 
+    public override async Task StartAsync(CancellationToken cancellationToken)
+    {
+        var getMe = await _client.GetMeAsync(cancellationToken);
+        Log.Information("Bot[{FName}:{LName}] Started ON :{UserName}",
+            getMe.FirstName, getMe.LastName, getMe.Username);
+        await base.StartAsync(cancellationToken);
+    }
+
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         try

@@ -6,6 +6,7 @@ using SpeechToolsBot.ApiCalls;
 using SpeechToolsBot.BackgroundServices;
 using SpeechToolsBot.Common.Files;
 using SpeechToolsBot.UpdateProcessors;
+using SpeechToolsBot.UpdateProcessors.CommandHandlers;
 using Telegram.Bot;
 
 namespace SpeechToolsBot.Common.Extensions;
@@ -35,7 +36,10 @@ internal static class StartupExtensions
 
         Log.Logger = configuration.CreateLogger();
 
-        host.ConfigureLogging(builder => { builder.AddSerilog(Log.Logger); });
+        host.ConfigureLogging(builder =>
+        {
+            builder.AddSerilog(Log.Logger);
+        });
     }
 
     public static void AddConfiguration(this IHostBuilder host)
@@ -50,23 +54,24 @@ internal static class StartupExtensions
                 .Build();
 
             var clientId = configurationRoot.GetSection("AzureConfig:ApplicationClientId").Get<string>();
+
             if (StaticVariables.EnvironmentName == Environments.Development)
             {
                 var thumbPrint = configurationRoot.GetSection("AzureConfig:ThumbPrint").Get<string>();
-                builder.AddAzureKeyVault("https://qwxpkeyvault.vault.azure.net/", clientId, thumbPrint.GetCertificate());
+                builder.AddAzureKeyVault("https://qwxpkeyvault.vault.azure.net/", clientId, thumbPrint.GetCertificate(), StaticVariables.SecretManager);
             }
             else
             {
                 var secret = Environment.GetEnvironmentVariable("DOTNET_AzureAuthSecret");
                 if (secret is null)
                 {
-                    foreach (var variable in Environment.GetEnvironmentVariables().Cast<DictionaryEntry>().Where(variable => variable.Key.ToString().Contains("DOTNET_AzureAuthSecret")))
+                    foreach (var variable in Environment.GetEnvironmentVariables().Cast<DictionaryEntry>().Where(variable => variable.Key.ToString()!.Contains("DOTNET_AzureAuthSecret")))
                     {
-                        secret = variable.Value.ToString();
+                        secret = variable.Value!.ToString();
                         break;
                     }
                 }
-                builder.AddAzureKeyVault("https://qwxpkeyvault.vault.azure.net/", clientId, secret);
+                builder.AddAzureKeyVault("https://qwxpkeyvault.vault.azure.net/", clientId, secret, StaticVariables.SecretManager);
             }
         });
     }
@@ -77,9 +82,9 @@ internal static class StartupExtensions
         {
             var botToken = builder.Configuration.GetSection("BotToken").Get<string>();
             collection.AddSingleton<ITelegramBotClient, TelegramBotClient>(_ => new TelegramBotClient(botToken));
-
             collection.AddSingleton<TextMessage>();
             collection.AddSingleton<AudioMessage>();
+            collection.AddSingleton<MainCommandHandler>();
 
             var subscriptionKey = builder.Configuration.GetSection("SpeechApiKey").Get<string>();
             var speechConfig = SpeechConfig.FromSubscription(subscriptionKey, "eastus");
@@ -89,7 +94,13 @@ internal static class StartupExtensions
         });
     }
 
-    public static void AddBackgroundServices(this IHostBuilder host) { host.ConfigureServices(collection => { collection.AddHostedService<UpdateReceiver>(); }); }
+    public static void AddBackgroundServices(this IHostBuilder host)
+    {
+        host.ConfigureServices(collection =>
+        {
+            collection.AddHostedService<UpdateReceiver>();
+        });
+    }
 
     public static void AddDumpCleaner()
     {

@@ -1,19 +1,23 @@
 ﻿using System.Diagnostics;
 using SpeechToolsBot.ApiCalls;
+using SpeechToolsBot.UpdateProcessors.CommandHandlers;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
 namespace SpeechToolsBot.UpdateProcessors;
 
 internal class TextMessage
 {
     private readonly ITelegramBotClient _client;
+    private readonly MainCommandHandler _mainCommandHandler;
     private readonly TextToSpeechApi _textToSpeechApi;
 
-    public TextMessage(ITelegramBotClient client, TextToSpeechApi textToSpeechApi)
+    public TextMessage(ITelegramBotClient client, TextToSpeechApi textToSpeechApi, MainCommandHandler mainCommandHandler)
     {
         _client = client;
         _textToSpeechApi = textToSpeechApi;
+        _mainCommandHandler = mainCommandHandler;
     }
 
 
@@ -22,12 +26,19 @@ internal class TextMessage
         if (message.Text is null or "")
             return;
 
-        if (message.Text.Length > 100)
+        if (_mainCommandHandler.IsCommand(message.Text))
         {
-            await _client.SendTextMessageAsync(message.Chat.Id, "Your Message Must Be Shorter Than 100 Character.", cancellationToken: ct);
-
+            await _mainCommandHandler.ProcessCommandAsync(message);
             return;
         }
+
+        if (message.Text.Length is > 100 or < 3)
+        {
+            await _client.SendTextMessageAsync(message.Chat.Id, "Your Message Must Be Shorter Than 100 Character.", cancellationToken: ct);
+            return;
+        }
+
+        await _client.SendTextMessageAsync(message.Chat.Id, "<i>Processing Your Audio...</i>", ParseMode.Html, cancellationToken: ct);
 
         var apiResponse = await _textToSpeechApi.GetAudioAsync(message.Text);
         if (apiResponse is null)
@@ -40,9 +51,10 @@ internal class TextMessage
         {
             await using var stream = new MemoryStream();
             await stream.WriteAsync(apiResponse.AudioData, ct);
-            //stream.Position = 0;
 
-            await _client.SendVoiceAsync(message.Chat.Id, stream!, $"Status :{apiResponse.Reason}", duration: apiResponse.AudioDuration.Seconds, cancellationToken: ct);
+            stream.Position = 0;
+
+            await _client.SendVoiceAsync(message.Chat.Id, stream, $"Status : {apiResponse.Reason}\nDuration:{apiResponse.AudioDuration:g}", duration: apiResponse.AudioDuration.Seconds, cancellationToken: ct);
         }
         catch (OverflowException)
         {

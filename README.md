@@ -7,5 +7,5 @@
 #### *Convert Voice/Audio To Text.*
 
 
-**Live Demo In** [QwxpSpeechToolsBot](https://t.me/QwxpSpeechToolsBot)
+**Live Demo In** ~~[QwxpSpeechToolsBot](https://t.me/QwxpSpeechToolsBot)~~ (expired)
 
